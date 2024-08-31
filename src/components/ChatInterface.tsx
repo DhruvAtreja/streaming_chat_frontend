@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
 import InputArea from "./InputArea";
 import HomeComponent from "./HomeComponent";
+import Settings from "./Settings";
 import { Client } from "@langchain/langgraph-sdk";
+import { Model } from "./Settings";
+import SkeletonMessage from "./SkeletonMessage";
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
     []
   );
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [model, setModel] = useState<Model>("gpt-4o-mini");
+  const [userId, setUserId] = useState<string>("");
+
+  const [systemInstructions, setSystemInstructions] = useState<string>("");
 
   const formatToolCalls = (toolCalls: any) => {
     if (toolCalls && toolCalls.length > 0) {
@@ -22,8 +30,11 @@ export default function ChatInterface() {
     return "No tool calls";
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSendMessage = async (message: string) => {
     setMessages([...messages, { text: message, sender: "user" }]);
+    setIsLoading(true);
 
     if (!threadId) {
       console.error("Thread ID is not available");
@@ -36,7 +47,13 @@ export default function ChatInterface() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ threadId, message }),
+        body: JSON.stringify({
+          threadId,
+          message,
+          model,
+          userId,
+          systemInstructions,
+        }),
       });
 
       if (!response.ok) {
@@ -48,7 +65,9 @@ export default function ChatInterface() {
 
       while (true) {
         const { value, done } = await reader!.read();
-        if (done) break;
+        if (done) {
+          break;
+        }
         const chunk = decoder.decode(value);
         const events = chunk.split("\n\n");
 
@@ -61,6 +80,7 @@ export default function ChatInterface() {
       }
     } catch (error) {
       console.error("Error streaming messages:", error);
+      setIsLoading(false);
     }
   };
 
@@ -82,6 +102,7 @@ export default function ChatInterface() {
             setMessages((prevMessages) => {
               const lastMessage = prevMessages[prevMessages.length - 1];
               if (lastMessage && lastMessage.sender === "ai") {
+                setIsLoading(false);
                 return [
                   ...prevMessages.slice(0, -1),
                   { text: content, sender: "ai" },
@@ -121,6 +142,8 @@ export default function ChatInterface() {
         const response = await fetch("/api/createThread", { method: "POST" });
         const data = await response.json();
         setThreadId(data.thread_id);
+        setUserId(uuidv4());
+        console.log(data);
       } catch (error) {
         console.error("Error creating thread:", error);
       }
@@ -131,10 +154,18 @@ export default function ChatInterface() {
 
   return (
     <div className="w-full h-screen bg-[#212121] overflow-hidden rounded-lg shadow-md">
+      <div className="flex justify-end p-4">
+        <Settings
+          onModelChange={setModel}
+          onSystemInstructionsChange={setSystemInstructions}
+          currentModel={model}
+          currentSystemInstructions={systemInstructions}
+        />
+      </div>
       {messages.length === 0 ? (
         <HomeComponent onMessageSelect={handleMessageSelect} />
       ) : (
-        <MessageList messages={messages} />
+        <MessageList messages={messages} isLoading={isLoading} />
       )}
       <InputArea onSendMessage={handleSendMessage} />
     </div>

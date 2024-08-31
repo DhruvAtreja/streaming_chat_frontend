@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { Client } from "@langchain/langgraph-sdk";
 
 export async function POST(req: NextRequest) {
-  const { threadId, message } = await req.json();
+  const { threadId, message, model, userId, systemInstructions } =
+    await req.json();
 
   const client = new Client({
     apiUrl: process.env.LANGGRAPH_API_URL as string,
@@ -15,9 +16,14 @@ export async function POST(req: NextRequest) {
         content: message,
       },
     ],
-    userId: "dhruv",
+    userId: userId,
   };
-  const config = { configurable: { model_name: "openai" } };
+  const config = {
+    configurable: {
+      model_name: model,
+      system_instructions: systemInstructions,
+    },
+  };
 
   const stream = await client.runs.stream(threadId, "agent", {
     input,
