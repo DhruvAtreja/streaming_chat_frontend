@@ -88,10 +88,7 @@ export default function ChatInterface() {
       {messages.length === 0 ? (
         <HomeComponent onMessageSelect={handleSendMessage} />
       ) : (
-        <div
-          ref={messageListRef}
-          className="overflow-y-auto h-[calc(100vh-180px)]"
-        >
+        <div ref={messageListRef} className="overflow-y-auto h-screen">
           <MessageList messages={messages} isLoading={isLoading} />
         </div>
       )}

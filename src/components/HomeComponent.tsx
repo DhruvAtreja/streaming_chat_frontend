@@ -18,7 +18,7 @@ const HomeComponent: React.FC<{
         alt="StreamChat"
         width={80}
         height={80}
-        className="mb-8"
+        className="mb-8 rounded-full"
       />
       <div className="grid grid-cols-2 gap-4">
         {exampleMessages.map((message, index) => (
