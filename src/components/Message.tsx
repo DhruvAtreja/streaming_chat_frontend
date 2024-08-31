@@ -29,7 +29,7 @@ export default function Message({
       <div
         className={`overflow-x-wrap break-words p-5 rounded-3xl ${
           isBot
-            ? " w-full opacity-90"
+            ? " w-full opacity-90 text-sm"
             : "mt-10 max-w-md bg-[#2f2f2f] text-sm text-white opacity-90"
         }`}
       >
