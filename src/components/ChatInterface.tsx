@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
 import InputArea from "./InputArea";
@@ -19,6 +19,8 @@ export default function ChatInterface() {
   const [userId, setUserId] = useState<string>("");
 
   const [systemInstructions, setSystemInstructions] = useState<string>("");
+
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   const formatToolCalls = (toolCalls: any) => {
     if (toolCalls && toolCalls.length > 0) {
@@ -152,6 +154,12 @@ export default function ChatInterface() {
     createThread();
   }, []);
 
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="w-full h-screen bg-[#212121] overflow-hidden rounded-lg shadow-md">
       <div className="flex justify-end p-4">
@@ -165,7 +173,12 @@ export default function ChatInterface() {
       {messages.length === 0 ? (
         <HomeComponent onMessageSelect={handleMessageSelect} />
       ) : (
-        <MessageList messages={messages} isLoading={isLoading} />
+        <div
+          ref={messageListRef}
+          className="overflow-y-auto h-[calc(100vh-180px)]"
+        >
+          <MessageList messages={messages} isLoading={isLoading} />
+        </div>
       )}
       <InputArea onSendMessage={handleSendMessage} />
     </div>
