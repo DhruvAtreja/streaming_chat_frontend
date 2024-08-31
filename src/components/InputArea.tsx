@@ -16,7 +16,7 @@ export default function InputArea({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 ">
+    <form onSubmit={handleSubmit} className=" p-0">
       <div className="flex fixed left-1/4 w-1/2 h-[60px] mx-auto bottom-5  ">
         <input
           type="text"
