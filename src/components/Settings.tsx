@@ -20,11 +20,14 @@ export default function Settings({
 
   return (
     <div className="absolute  right-0">
-      <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-white">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 text-xl text-white"
+      >
         ⚙️
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-md shadow-lg z-10 p-4">
+        <div className="absolute right-0  mt-2 w-64 bg-gray-800 rounded-md shadow-lg z-10 p-4">
           <h3 className="font-bold mb-2">Model</h3>
           {models.map((model) => (
             <button

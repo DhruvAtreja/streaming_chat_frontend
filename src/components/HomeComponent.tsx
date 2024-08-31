@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const exampleMessages = [
   "What's the weather in SF?",
@@ -12,7 +13,13 @@ const HomeComponent: React.FC<{
 }> = ({ onMessageSelect }) => {
   return (
     <div className="flex flex-col items-center  justify-center h-full">
-      <h1 className="text-4xl font-semibold text-white mb-8">StreamChat</h1>
+      <Image
+        src="/logo.jpeg"
+        alt="StreamChat"
+        width={80}
+        height={80}
+        className="mb-8"
+      />
       <div className="grid grid-cols-2 gap-4">
         {exampleMessages.map((message, index) => (
           <div

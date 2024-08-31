@@ -79,14 +79,12 @@ export default function ChatInterface() {
 
   return (
     <div className="w-full h-screen bg-[#212121] overflow-hidden rounded-lg shadow-md">
-      <div className="flex justify-end p-4">
-        <Settings
-          onModelChange={setModel}
-          onSystemInstructionsChange={setSystemInstructions}
-          currentModel={model as any}
-          currentSystemInstructions={systemInstructions}
-        />
-      </div>
+      <Settings
+        onModelChange={setModel}
+        onSystemInstructionsChange={setSystemInstructions}
+        currentModel={model as any}
+        currentSystemInstructions={systemInstructions}
+      />
       {messages.length === 0 ? (
         <HomeComponent onMessageSelect={handleSendMessage} />
       ) : (
