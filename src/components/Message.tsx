@@ -1,11 +1,15 @@
 import Markdown from "react-markdown";
+import ToolCall from "./ToolCall";
+import { ToolCall as ToolCallType } from "../types";
 
 export default function Message({
   text,
   sender,
+  toolCalls,
 }: {
   text: string;
   sender: string;
+  toolCalls?: ToolCallType[];
 }) {
   const isBot = sender === "ai";
   return (
@@ -25,10 +29,14 @@ export default function Message({
       <div
         className={`overflow-x-wrap break-words p-5 rounded-3xl ${
           isBot
-            ? "mb-10 w-full opacity-90"
-            : "max-w-md bg-[#2f2f2f] text-sm text-white opacity-90"
+            ? " w-full opacity-90"
+            : "mt-10 max-w-md bg-[#2f2f2f] text-sm text-white opacity-90"
         }`}
       >
+        {toolCalls &&
+          toolCalls.map((toolCall, index) => (
+            <ToolCall key={index} {...toolCall} />
+          ))}
         {isBot ? <Markdown>{text}</Markdown> : text}
       </div>
     </div>

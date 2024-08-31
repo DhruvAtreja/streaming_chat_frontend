@@ -20,6 +20,8 @@ export default function ChatInterface() {
 
   const messageListRef = useRef<HTMLDivElement>(null);
 
+  console.log("messages", messages);
+
   useEffect(() => {
     const initializeChat = async () => {
       const { thread_id } = await createThread();
