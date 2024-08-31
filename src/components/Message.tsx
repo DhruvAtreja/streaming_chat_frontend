@@ -1,6 +1,7 @@
 import Markdown from "react-markdown";
 import ToolCall from "./ToolCall";
 import { ToolCall as ToolCallType } from "../types";
+import { useState, useEffect } from "react";
 
 export default function Message({
   text,
@@ -12,11 +13,19 @@ export default function Message({
   toolCalls?: ToolCallType[];
 }) {
   const isBot = sender === "ai";
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
     <div
       className={`flex ${
         isBot ? "justify-start" : "justify-end"
-      } mb-4 relative`}
+      } mb-4 relative transition-opacity duration-1000 ease-in-out ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
     >
       {isBot && (
         <img
