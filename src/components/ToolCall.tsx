@@ -12,7 +12,8 @@ const ToolCall = ({
   result?: any;
 }) => {
   const [isResultVisible, setIsResultVisible] = useState(false);
-
+  const resultObject = JSON.parse(result);
+  const resultString = JSON.stringify(resultObject[0], null, 2);
   return (
     <div className="bg-[#3a3a3a] text-white p-4 rounded-lg mb-2 text-sm relative">
       <div className="w-full mb-2 flex justify-between items-center">
@@ -36,7 +37,10 @@ const ToolCall = ({
           }`}
         >
           <p>
-            <strong>Result:</strong> {result}
+            <strong>Result:</strong>{" "}
+            <div className="text-sm">
+              <pre>{resultString}</pre>
+            </div>
           </p>
         </div>
       )}
