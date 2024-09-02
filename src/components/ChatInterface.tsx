@@ -8,9 +8,16 @@ import HomeComponent from "./HomeComponent";
 import Settings from "./Settings";
 import { Message, Model } from "../types";
 import { handleStreamEvent } from "../utils/streamHandler";
-import { createAssistant, createThread, sendMessage } from "../utils/chatApi";
+import {
+  createAssistant,
+  createThread,
+  getThreadState,
+  sendMessage,
+} from "../utils/chatApi";
 import { ASSISTANT_ID_COOKIE } from "@/constants";
 import { getCookie, setCookie } from "@/utils/cookies";
+import { ThreadState } from "@langchain/langgraph-sdk";
+import { GraphInterrupt } from "./Interrupted";
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -20,6 +27,10 @@ export default function ChatInterface() {
   const [userId, setUserId] = useState<string>("");
   const [systemInstructions, setSystemInstructions] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [threadState, setThreadState] =
+    useState<ThreadState<Record<string, any>>>();
+  const [graphInterrupted, setGraphInterrupted] = useState(false);
+  const [allowNullMessage, setAllowNullMessage] = useState(false);
 
   const messageListRef = useRef<HTMLDivElement>(null);
 
@@ -50,8 +61,10 @@ export default function ChatInterface() {
     }
   }, [messages]);
 
-  const handleSendMessage = async (message: string) => {
-    setMessages([...messages, { text: message, sender: "user" }]);
+  const handleSendMessage = async (message: string | null) => {
+    if (message !== null) {
+      setMessages([...messages, { text: message, sender: "user" }]);
+    }
     setIsLoading(true);
 
     if (!threadId) {
@@ -64,6 +77,9 @@ export default function ChatInterface() {
     }
 
     try {
+      setThreadState(undefined);
+      setGraphInterrupted(false);
+      setAllowNullMessage(false);
       const response = await sendMessage({
         threadId,
         assistantId,
@@ -93,6 +109,12 @@ export default function ChatInterface() {
           console.error("Error parsing JSON data");
         }
       }
+      // Fetch the current state of the thread
+      const currentState = await getThreadState(threadId);
+      setThreadState(currentState);
+      if (currentState.next.length) {
+        setGraphInterrupted(true);
+      }
     } catch (error) {
       console.error("Error streaming messages:", error);
       setIsLoading(false);
@@ -112,6 +134,26 @@ export default function ChatInterface() {
       ) : (
         <div ref={messageListRef} className="overflow-y-auto h-screen">
           <MessageList messages={messages} isLoading={isLoading} />
+          {!!graphInterrupted && !!threadState && !!threadId ? (
+            <div className="flex items-center justify-start w-2/3 mx-auto">
+              <GraphInterrupt
+                setAllowNullMessage={setAllowNullMessage}
+                threadId={threadId}
+                state={threadState}
+              />
+            </div>
+          ) : null}
+          {allowNullMessage && (
+            <div className="flex flex-col w-2/3 mx-auto overflow-y-scroll pb-[100px]">
+              <button
+                onClick={async () => handleSendMessage(null)}
+                disabled={isLoading}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2 max-w-[400px] mx-auto"
+              >
+                Continue
+              </button>
+            </div>
+          )}
         </div>
       )}
       <InputArea onSendMessage={handleSendMessage} />

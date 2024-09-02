@@ -102,6 +102,12 @@ export const handleStreamEvent = (
           ];
         }
       });
+    } else if (dataItem.type === "ai" && dataItem.content) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: dataItem.content, sender: "ai" },
+      ]);
     }
+    setIsLoading(false);
   }
 };

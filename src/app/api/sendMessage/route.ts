@@ -10,15 +10,19 @@ export async function POST(req: NextRequest) {
     apiKey: process.env.LANGCHAIN_API_KEY as string,
   });
 
-  const input = {
-    messages: [
-      {
-        role: "human",
-        content: message,
-      },
-    ],
-    userId: userId,
-  };
+  let input: Record<string, any> | null = null;
+  if (message !== null) {
+    input = {
+      messages: [
+        {
+          role: "human",
+          content: message,
+        },
+      ],
+      userId: userId,
+    };
+  }
+
   const config = {
     configurable: {
       model_name: model,
