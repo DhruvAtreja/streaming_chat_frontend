@@ -1,12 +1,13 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Client } from "@langchain/langgraph-sdk";
 
 export async function POST(req: NextRequest) {
-  const { threadId, message, model, userId, systemInstructions } =
+  const { threadId, assistantId, message, model, userId, systemInstructions } =
     await req.json();
 
   const client = new Client({
     apiUrl: process.env.LANGGRAPH_API_URL as string,
+    apiKey: process.env.LANGCHAIN_API_KEY as string,
   });
 
   const input = {
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
     },
   };
 
-  const stream = await client.runs.stream(threadId, "agent", {
+  const stream = client.runs.stream(threadId, assistantId, {
     input,
     config,
     streamMode: "messages",
@@ -33,23 +34,21 @@ export async function POST(req: NextRequest) {
 
   const encoder = new TextEncoder();
 
-  return new Response(
-    new ReadableStream({
-      async start(controller) {
-        for await (const event of stream) {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(event)}\n\n`)
-          );
-        }
-        controller.close();
-      },
-    }),
-    {
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    }
-  );
+  const responseStream = new ReadableStream({
+    async start(controller) {
+      for await (const event of stream) {
+        controller.enqueue(encoder.encode(JSON.stringify(event)));
+      }
+
+      controller.close();
+    },
+  });
+
+  return new NextResponse(responseStream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }

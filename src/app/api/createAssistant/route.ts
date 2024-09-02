@@ -1,15 +1,20 @@
 import { Client } from "@langchain/langgraph-sdk";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
+    const data = await req.json();
+    const { graphId } = data;
+
     const client = new Client({
       apiUrl: process.env.LANGGRAPH_API_URL as string,
       apiKey: process.env.LANGCHAIN_API_KEY as string,
     });
 
-    const thread = await client.threads.create();
-    return NextResponse.json(thread);
+    const assistant = await client.assistants.create({
+      graphId,
+    });
+    return NextResponse.json(assistant);
   } catch (error) {
     console.error("Error creating thread:", error);
     return NextResponse.json(

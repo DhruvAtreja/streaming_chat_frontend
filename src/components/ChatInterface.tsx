@@ -8,11 +8,14 @@ import HomeComponent from "./HomeComponent";
 import Settings from "./Settings";
 import { Message, Model } from "../types";
 import { handleStreamEvent } from "../utils/streamHandler";
-import { createThread, sendMessage } from "../utils/chatApi";
+import { createAssistant, createThread, sendMessage } from "../utils/chatApi";
+import { ASSISTANT_ID_COOKIE } from "@/constants";
+import { getCookie, setCookie } from "@/utils/cookies";
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [assistantId, setAssistantId] = useState<string | null>(null);
   const [model, setModel] = useState<Model>("gpt-4o-mini" as Model);
   const [userId, setUserId] = useState<string>("");
   const [systemInstructions, setSystemInstructions] = useState<string>("");
@@ -20,12 +23,21 @@ export default function ChatInterface() {
 
   const messageListRef = useRef<HTMLDivElement>(null);
 
-  console.log("messages", messages);
-
   useEffect(() => {
     const initializeChat = async () => {
+      let assistantId = getCookie(ASSISTANT_ID_COOKIE);
+      if (!assistantId) {
+        const assistant = await createAssistant(
+          process.env.NEXT_PUBLIC_LANGGRAPH_GRAPH_ID as string
+        );
+        assistantId = assistant.assistant_id as string;
+        setCookie(ASSISTANT_ID_COOKIE, assistantId);
+        setAssistantId(assistantId);
+      }
+
       const { thread_id } = await createThread();
       setThreadId(thread_id);
+      setAssistantId(assistantId);
       setUserId(uuidv4());
     };
 
@@ -46,10 +58,15 @@ export default function ChatInterface() {
       console.error("Thread ID is not available");
       return;
     }
+    if (!assistantId) {
+      console.error("Assistant ID is not available");
+      return;
+    }
 
     try {
       const response = await sendMessage({
         threadId,
+        assistantId,
         message,
         model,
         userId,
@@ -59,18 +76,21 @@ export default function ChatInterface() {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
+      if (!reader) {
+        console.error("Response body is not readable");
+        return;
+      }
+
       while (true) {
-        const { value, done } = await reader!.read();
+        const { value, done } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const events = chunk.split("\n\n");
-
-        for (const event of events) {
-          if (event.startsWith("data: ")) {
-            const jsonData = JSON.parse(event.slice(6));
-            handleStreamEvent(jsonData, setMessages, setIsLoading);
-          }
+        try {
+          const jsonData = JSON.parse(chunk);
+          handleStreamEvent(jsonData, setMessages, setIsLoading);
+        } catch (_) {
+          console.error("Error parsing JSON data");
         }
       }
     } catch (error) {
