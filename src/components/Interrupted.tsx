@@ -1,10 +1,6 @@
 import { updateState } from "@/utils/chatApi";
 import { ThreadState } from "@langchain/langgraph-sdk";
-import dynamic from "next/dynamic";
 import { useState } from "react";
-
-// Throws build errors if we try to import this normally
-const ReactJson = dynamic(() => import("react-json-view"), { ssr: false });
 
 export interface GraphInterruptProps {
   threadId: string;
