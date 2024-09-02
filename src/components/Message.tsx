@@ -38,13 +38,14 @@ export default function Message({
       <div
         className={`overflow-x-wrap break-words p-5 rounded-3xl ${
           isBot
-            ? " w-full opacity-90 text-sm"
-            : "mt-10 max-w-md bg-[#2f2f2f] text-sm text-white opacity-90"
+            ? "w-full opacity-90 text-gray-200"
+            : "mt-10 max-w-md text-gray-200 opacity-90"
         }`}
       >
         {toolCalls &&
-          toolCalls.map((toolCall, index) => (
-            <ToolCall key={index} {...toolCall} />
+          toolCalls.length > 0 &&
+          toolCalls.map((toolCall) => (
+            <ToolCall key={toolCall.id} {...toolCall} />
           ))}
         {isBot ? <Markdown>{text}</Markdown> : text}
       </div>

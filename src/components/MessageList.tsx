@@ -9,7 +9,6 @@ export default function MessageList({
   messages: MessageType[];
   isLoading: boolean;
 }) {
-  console.log("messages", messages);
   return (
     <div className="max-h-screen pb-[100px] w-2/3 mx-auto p-10 overflow-y-scroll">
       {messages.map((message, index) => (
