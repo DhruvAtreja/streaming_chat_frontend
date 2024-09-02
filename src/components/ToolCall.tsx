@@ -15,6 +15,20 @@ const ToolCall = ({
   result?: any;
 }) => {
   const [isResultVisible, setIsResultVisible] = useState(false);
+
+  let parsedArgs: Record<string, any> | null = null;
+  let isParsedArgsDefined = false;
+  try {
+    if (typeof args === "string") {
+      parsedArgs = JSON.parse(args);
+    } else if (typeof args === "object") {
+      parsedArgs = args;
+    }
+    isParsedArgsDefined = true;
+  } catch (_) {
+    // incomplete JSON, no-op
+  }
+
   let resultString: string | null = null;
   let resultObject: Record<string, any> | null = null;
   let isResultDefined = false;
@@ -32,23 +46,43 @@ const ToolCall = ({
   }
 
   return (
-    <div className="bg-[#3a3a3a] text-white p-4 rounded-lg mb-2 text-sm relative">
+    <div className="bg-[#3a3a3a] text-white p-4 rounded-lg mb-2 text-sm relative flex flex-col gap-1">
       <div className="w-full mb-2 flex justify-between items-center">
-        <span className="text-xs text-gray-400">Tool Call</span>
+        <div className="flex flex-row items-center justify-start gap-2">
+          <span className="text-gray-400">Tool Call:</span>
+          <p className="text-small opacity-80">{name}</p>
+        </div>
         {isResultDefined && (
           <button
             onClick={() => setIsResultVisible(!isResultVisible)}
             className="text-gray-400 hover:text-gray-300 focus:outline-none"
           >
-            {isResultVisible ? "Hide" : "Show"}
+            {isResultVisible ? "Hide result" : "Show result"}
           </button>
         )}
       </div>
-      {/*  */}
-      <code>
-        {typeof args === "string" ? args : JSON.stringify(args, null, 2)}
-      </code>
-      <p className="text-xs opacity-80">{name}</p>
+
+      <div className="flex flex-col gap-1">
+        <p className="text-gray-400">Arguments:</p>
+        <span>
+          {isParsedArgsDefined && parsedArgs ? (
+            <ReactJson
+              displayObjectSize={false}
+              style={{ backgroundColor: "transparent" }}
+              displayDataTypes={false}
+              quotesOnKeys={false}
+              enableClipboard={false}
+              name={false}
+              src={parsedArgs}
+              theme="tomorrow"
+            />
+          ) : typeof args === "string" ? (
+            <p>{args}</p>
+          ) : (
+            <code>{JSON.stringify(args, null, 2)}</code>
+          )}
+        </span>
+      </div>
 
       {isResultDefined && (
         <div
@@ -57,10 +91,21 @@ const ToolCall = ({
           }`}
         >
           <span>
-            <strong>Result:</strong>{" "}
-            <div className="text-sm">
+            <p className="text-gray-400">Result:</p>
+            <div>
               {resultObject && !resultString ? (
-                <ReactJson src={resultObject} theme="tomorrow" />
+                <ReactJson
+                  displayObjectSize={false}
+                  style={{
+                    backgroundColor: "transparent",
+                  }}
+                  displayDataTypes={false}
+                  quotesOnKeys={false}
+                  enableClipboard={false}
+                  name={false}
+                  src={resultObject}
+                  theme="tomorrow"
+                />
               ) : null}
               {resultString && !resultObject && <p>{resultString}</p>}
             </div>
