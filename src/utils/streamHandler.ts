@@ -12,44 +12,6 @@ export const handleStreamEvent = (
         Array.isArray(dataItem.tool_calls) &&
         dataItem.tool_calls.length > 0
       ) {
-        // setMessages((prevMessages) => {
-        //   const lastMessage = prevMessages[prevMessages.length - 1];
-        //   if (lastMessage && lastMessage.sender === "ai") {
-        //     if (lastMessage.toolCalls && lastMessage.toolCalls.length > 0) {
-        //       // If the last message was also a tool call, update it with new tool calls
-        //       return [
-        //         ...prevMessages.slice(0, -1),
-        //         {
-        //           ...lastMessage,
-        //           toolCalls: [
-        //             ...lastMessage.toolCalls,
-        //             ...dataItem.tool_calls.filter(
-        //               (newTc: ToolCall) =>
-        //                 !lastMessage.toolCalls?.some(
-        //                   (existingTc) => existingTc.id === newTc.id
-        //                 )
-        //             ),
-        //           ],
-        //         },
-        //       ];
-        //     } else {
-        //       // If the last message was not a tool call, add the tool call to it
-        //       return [
-        //         ...prevMessages.slice(0, -1),
-        //         {
-        //           ...lastMessage,
-        //           toolCalls: dataItem.tool_calls,
-        //         },
-        //       ];
-        //     }
-        //   } else {
-        //     // If the last message was not from AI, add a new message
-        //     return [
-        //       ...prevMessages,
-        //       { text: "", sender: "ai", toolCalls: dataItem.tool_calls },
-        //     ];
-        //   }
-        // });
         setMessages((prevMessages) => {
           const lastMessage = prevMessages[prevMessages.length - 1];
           if (lastMessage && lastMessage.sender === "ai") {
@@ -118,7 +80,6 @@ export const handleStreamEvent = (
 
       // Only set args if it's truthy
       if (dataItem.artifact) {
-        console.log("artifact", dataItem.artifact);
         toolCall.args = dataItem.artifact;
       }
 
