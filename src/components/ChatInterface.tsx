@@ -63,7 +63,7 @@ export default function ChatInterface() {
 
   const handleSendMessage = async (message: string | null) => {
     if (message !== null) {
-      setMessages([...messages, { text: message, sender: "user" }]);
+      setMessages([...messages, { text: message, sender: "user", id: uuidv4() }]);
     }
     setIsLoading(true);
 

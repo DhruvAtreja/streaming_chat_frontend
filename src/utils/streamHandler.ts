@@ -5,6 +5,8 @@ export const handleStreamEvent = (
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  let currentMessageId: string | undefined;
+
   if (event.event === "messages/partial") {
     event.data.forEach((dataItem: any) => {
       if (
@@ -42,7 +44,7 @@ export const handleStreamEvent = (
             // If the last message was not from AI, add a new message
             return [
               ...prevMessages,
-              { text: "", sender: "ai", toolCalls: dataItem.tool_calls },
+              { text: "", sender: "ai", toolCalls: dataItem.tool_calls, id: dataItem.id },
             ];
           }
         });
@@ -62,7 +64,7 @@ export const handleStreamEvent = (
           } else {
             return [
               ...prevMessages,
-              { text: dataItem.content, sender: "ai", toolCalls: [] },
+              { text: dataItem.content, sender: "ai", toolCalls: [], id: dataItem.id },
             ];
           }
         });
@@ -98,15 +100,25 @@ export const handleStreamEvent = (
         } else {
           return [
             ...prevMessages,
-            { text: "", sender: "ai", toolCalls: [toolCall as ToolCall] },
+            { text: "", sender: "ai", toolCalls: [toolCall as ToolCall], id: dataItem.id },
           ];
         }
       });
     } else if (dataItem.type === "ai" && dataItem.content) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: dataItem.content, sender: "ai" },
-      ]);
+      if (!currentMessageId) {
+        currentMessageId = dataItem.id;
+      }
+
+      setMessages((prevMessages) => {
+        const messageExists = prevMessages.some((msg) => msg.id === dataItem.id) || currentMessageId === dataItem.id;
+        if (messageExists) {
+          return prevMessages;
+        }
+        return [
+          ...prevMessages,
+          { id: dataItem.id, text: dataItem.content, sender: "ai" },
+        ];
+      });
     }
     setIsLoading(false);
   }
