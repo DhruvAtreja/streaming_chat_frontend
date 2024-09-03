@@ -44,7 +44,12 @@ export const handleStreamEvent = (
             // If the last message was not from AI, add a new message
             return [
               ...prevMessages,
-              { text: "", sender: "ai", toolCalls: dataItem.tool_calls, id: dataItem.id },
+              {
+                text: "",
+                sender: "ai",
+                toolCalls: dataItem.tool_calls,
+                id: dataItem.id,
+              },
             ];
           }
         });
@@ -64,7 +69,12 @@ export const handleStreamEvent = (
           } else {
             return [
               ...prevMessages,
-              { text: dataItem.content, sender: "ai", toolCalls: [], id: dataItem.id },
+              {
+                text: dataItem.content,
+                sender: "ai",
+                toolCalls: [],
+                id: dataItem.id,
+              },
             ];
           }
         });
@@ -100,7 +110,12 @@ export const handleStreamEvent = (
         } else {
           return [
             ...prevMessages,
-            { text: "", sender: "ai", toolCalls: [toolCall as ToolCall], id: dataItem.id },
+            {
+              text: "",
+              sender: "ai",
+              toolCalls: [toolCall as ToolCall],
+              id: dataItem.id,
+            },
           ];
         }
       });
@@ -110,7 +125,9 @@ export const handleStreamEvent = (
       }
 
       setMessages((prevMessages) => {
-        const messageExists = prevMessages.some((msg) => msg.id === dataItem.id) || currentMessageId === dataItem.id;
+        const messageExists =
+          prevMessages.some((msg) => msg.id === dataItem.id) ||
+          currentMessageId === dataItem.id;
         if (messageExists) {
           return prevMessages;
         }
