@@ -38,7 +38,7 @@ export function GraphInterrupt(props: GraphInterruptProps) {
       </p>
       <div className="flex flex-col gap-2">
         <p className="text-gray-200">
-          If you'd like to update the state, enter valid JSON to the input
+          If you&apos;d like to update the state, enter valid JSON to the input
           below:
         </p>
         <input

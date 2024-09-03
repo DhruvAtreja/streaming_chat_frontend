@@ -1,4 +1,5 @@
 export type Message = {
+  id: string;
   text: string;
   sender: string;
   toolCalls?: ToolCall[];
