@@ -36,7 +36,7 @@ export default function Message({
         />
       )}
       <div
-        className={`overflow-x-wrap break-words p-5 rounded-3xl ${
+        className={`overflow-x-wrap break-words p-2 sm:p-5 rounded-3xl ${
           isBot
             ? "w-full opacity-90 text-gray-200"
             : "mt-10 max-w-md text-gray-200 opacity-90"

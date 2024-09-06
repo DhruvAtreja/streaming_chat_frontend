@@ -10,7 +10,7 @@ export default function MessageList({
   isLoading: boolean;
 }) {
   return (
-    <div className="pb-[100px] w-2/3 mx-auto p-10 overflow-y-scroll">
+    <div className="pb-[100px] w-full sm:w-2/3 mx-auto p-10 overflow-y-scroll">
       {messages.map((message, index) => (
         <div key={index}>
           <Message

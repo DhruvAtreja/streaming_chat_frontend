@@ -20,11 +20,11 @@ const HomeComponent: React.FC<{
         height={80}
         className="mb-8 rounded-full"
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mx-2 sm:mx-0">
         {exampleMessages.map((message, index) => (
           <div
             key={index}
-            className="bg-transparent border-[1px] border-[#ffffff1a] p-4 rounded-lg text-gray-400 cursor-pointer transition-all duration-500 ease-in-out hover:bg-[#2f2f2f] hover:scale-105"
+            className="bg-transparent border-[1px] border-[#ffffff1a] p-2 sm:p-4 rounded-lg text-gray-400 cursor-pointer transition-all duration-500 ease-in-out hover:bg-[#2f2f2f] hover:scale-105"
             onClick={() => onMessageSelect(message)}
           >
             {message}

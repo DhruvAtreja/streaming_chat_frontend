@@ -46,7 +46,7 @@ const ToolCall = ({
   }
 
   return (
-    <div className="bg-[#3a3a3a] text-white p-4 rounded-lg mb-2 text-sm relative flex flex-col gap-1">
+    <div className="bg-[#3a3a3a] text-white p-2 sm:p-4 rounded-lg mb-2 text-sm relative flex flex-col gap-1">
       <div className="w-full mb-2 flex justify-between items-center">
         <div className="flex flex-row items-center justify-start gap-2">
           <span className="text-gray-400">Tool Call:</span>
